@@ -1,0 +1,24 @@
+{
+  "name": "employee-db",
+  "version": "1.0.0",
+  "description": "This application allows users to manage their employee databases",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teacher2Coder/employee-db.git"
+  },
+  "author": "Teacher2Coder",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "8.2.4",
+    "pg": "^8.12.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Teacher2Coder/employee-db/issues"
+  },
+  "homepage": "https://github.com/Teacher2Coder/employee-db#readme"
+}

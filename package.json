@@ -15,11 +15,10 @@
   "license": "MIT",
   "dependencies": {
     "inquirer": "8.2.4",
-    "express": "^4.17.1",
     "pg": "^8.12.0"
   },
   "bugs": {
     "url": "https://github.com/Teacher2Coder/employee-db/issues"
   },
-  "homepage": "https://github.com/Teacher2Coder/employee-db#readme"
+  "homepage": "https://github.com/Teacher2Coder/employee-db"
 }

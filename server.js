@@ -8,6 +8,26 @@ const server = http.createServer(function (req, res) {
 })
 server.listen(3001);
 
+const line1 = String.raw`.------------------------------------------------------------------------.`
+const line2 = String.raw`|                                                                        |`
+const line3 = String.raw`|     ______                     _                                       |`
+const line4 = String.raw`|    | _____|                   | |                                      |`
+const line5 = String.raw`|    | |____  _ __ ___    _ __  | |   ___    _   _   _____    _____      |`
+const line6 = String.raw`|    |  ____||  _ ' _  \ |     \| | / __  \ | | | | /  __ \  /  __ \     |`
+const line7 = String.raw`|    | |____ | | | | | | | |_) || || (__)  || |_| ||  ____/ |  ____/     |`
+const line8 = String.raw`|    |______||_| |_| |_| | .__/ |_| \ ___ /  \__  | \______| \______|    |`
+const line9 = String.raw`|                        |_|                  |__/                       |`
+const line10= String.raw`|                                                                        |`
+const line11= String.raw`|       __   __                                                          |`
+const line12= String.raw`|      |  \_/  |                                                         |`
+const line13= String.raw`|      |       |   ___ _   _ __     ___ _    __ _    _____    _ __       |`
+const line14= String.raw`|      | |\_/| |  / _ ' | |  _  \  / _ ' |  / _  |  /  __ \  | '__|      |`
+const line15= String.raw`|      | |   | | | (_|  | | | | | | (_|  | | (_| | |  ____/  | |         |`
+const line16= String.raw`|      |_|   |_|  \___,_| |_| |_|  \___,_|  \__, |  \______| |_|         |`
+const line17= String.raw`|                                           |___/                        |`
+const line18= String.raw`.------------------------------------------------------------------------.`
+
+
 const pool = new Pool(
     {
       user: 'postgres',
@@ -15,14 +35,16 @@ const pool = new Pool(
       host: 'localhost',
       database: 'employees_db'
     },
-    console.log('Welcome to the employee manager!')
+    console.log(` ${line1} \n ${line2} \n ${line3} \n ${line4} \n ${line5} \n ${line6} \n ${line7} \n ${line8} \n ${line9} \n ${line10} \n ${line11} \n ${line12} \n ${line13} \n ${line14} \n ${line15} \n ${line16} \n ${line17} \n ${line18}`
+    )
 )
 
 pool.connect();
 
 // Displays all employees from employee table
 function handleViewEmployees() {
-  pool.query(`SELECT * FROM employees`, async (err, { rows }) => {
+  pool.query(`SELECT employees.first_name, employees.last_name, roles.title, roles.salary, departments.dept_name FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id;`, 
+    async (err, { rows }) => {
     try {
       console.log(rows);
     } catch (err) {
@@ -36,7 +58,7 @@ function handleViewEmployees() {
 
 // Displays all roles from roles table
 function handleViewRoles() {
-  pool.query(`SELECT * FROM roles`, async (err, { rows }) => {
+  pool.query(`SELECT roles.title, roles.salary, departments.dept_name FROM roles JOIN departments ON roles.department_id = departments.id;`, async (err, { rows }) => {
     try {
       console.log(rows);
     } catch (err) {
@@ -49,7 +71,7 @@ function handleViewRoles() {
 
 // Displays all departments from the departments table
 function handleViewDepts() {
-  pool.query(`SELECT * FROM departments`, async (err, { rows }) => {
+  pool.query(`SELECT dept_name FROM departments`, async (err, { rows }) => {
     try {
       console.log(rows);
     } catch (err) {
@@ -64,37 +86,61 @@ function handleViewDepts() {
 function handleAddEmployee() {
   inquirer
     .prompt(questions[3])
-    .then((res) => {
-      console.log(`Added ${res.fName} ${res.lName} to database`)
-    })
-  return init();
+    .then(async (res) => {
+      try {
+        const text = 'INSERT INTO employees (first_name, last_name, role) VALUES ($1, $2, $3)'
+        const values = [res.fName, res.lName, res.role];
+        pool.query(text, values)
+        console.log(`Added ${res.fName} ${res.lName} to database`)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        init();
+      }
+  })
 }
 
 // Adds a role to the role table
 function handleAddRole() {
   inquirer
     .prompt(questions[2])
-    .then((res) => {
-      console.log(`Added ${res.newRoleName} in the ${res.newRoleDept} department to database`)
+    .then(async (res) => {
+      try {
+        const text = 'INSERT INTO roles (first_name, last_name, role) VALUES ($1, $2, $3)'
+        const values = [];
+        pool.query(text, values)
+        console.log(`Added ${res.newRoleName} in the ${res.newRoleDept} department to database`)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        init();
+      }
     })
-  return init();
 }
 
 // Adds a department to the department table
 function handleAddDept() {
   inquirer
     .prompt(questions[1])
-    .then((res) => {
-      console.log(`Added ${res.newDeptName} to database`)
+    .then(async (res) => {
+      try {
+        const text = 'INSERT INTO departments (first_name, last_name, role) VALUES ($1, $2, $3)'
+        const values = [];
+        pool.query(text, values)
+        console.log(`Added ${res.newDeptName} to database`);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        init();
+      }
     })
-  return init();
 }
 
 // Updates an employee's role in the employee table
 function handleUpdateEmployeeRole() {
   inquirer
     .prompt(questions[4])
-    .then((res) => {
+    .then(async (res) => {
       console.log(`Updated ${res.selectedEmployee} to ${res.newRole} in database`)
     })
   // return init();
@@ -138,26 +184,3 @@ function init() {
 
 // Calls the init function on startup
 init();
-
-
-
-
-// Fun image to play with
-// .------------------------------------------------------------------------.
-// |                                                                        |
-// |     ______                     _                                       |
-// |    | _____|                   | |                                      |
-// |    | |____  _ __ ___    _ __  | |   ___    _   _   _____    _____      |
-// |    |  ____||  _   _  \ |     \| | / __  \ | | | | /  __ \  /  __ \     |
-// |    | |____ | | | | | | | |_) || || (__)  || |_| ||  ____/ |  ____/     |
-// |    |______||_| |_| |_| | .__/ |_| \ ___ /  \__  | \______| \______|    |
-// |                        |_|                  |__/                       |
-// |                                                                        |
-// |    __   __                                                             |
-// |   |  \_/  |                                                            |
-// |   |       |   ___ _   _ __     ___ _    __ _    _____    _ __          |
-// |   | |\_/| |  / _ | | | ,_  \  / _   |  / _  |  /  __ \  |  __|         |
-// |   | |   | | | (_|  | | | | | | (_|  | | (_| | |  ____/  | |            |
-// |   |_|   |_|  \___,_| |_| |_|  \___,_|  \__, |  \______| |_|            |
-// |                                        |___/                           |
-// .________________________________________________________________________.

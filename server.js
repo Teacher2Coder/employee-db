@@ -64,10 +64,12 @@ function handleViewEmployees() {
   pool.query(`SELECT employees.first_name, employees.last_name, roles.title, roles.salary, departments.dept_name FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id;`, 
     async (err, { rows }) => {
     try {
+      // Displays all employees in a table
       console.table(rows);
     } catch (err) {
       console.error(err)
     } finally {
+      // Return to the initial question loop
       init();
     }
   })
@@ -78,10 +80,12 @@ function handleViewEmployees() {
 function handleViewRoles() {
   pool.query(`SELECT roles.title, roles.salary, departments.dept_name FROM roles JOIN departments ON roles.department_id = departments.id;`, async (err, { rows }) => {
     try {
+      // Displays all roles in a table
       console.table(rows);
     } catch (err) {
       console.error(err)
     } finally {
+      // Return to the initial question loop
       init();
     }
   })
@@ -92,10 +96,12 @@ function handleViewRoles() {
 function handleViewDepts() {
   pool.query(`SELECT dept_name FROM departments`, async (err, { rows }) => {
     try {
+      // Displays the departments in a table
       console.table(rows);
     } catch (err) {
       console.error(err)
     } finally {
+      // Return to the initial question loop
       init();
     }
   })
@@ -107,16 +113,21 @@ function handleAddEmployee() {
     .prompt(addEmployeeQuestions)
     .then(async (res) => {
       try {
-        const role_id = findRoleId(res.role)
+        // Stores role as a usable variable
+        const role_id = await findRoleId(res.role)
+        console.log(role_id)
 
+        // Text and value variables to be passsed into pool.query
         const text = 'INSERT INTO employees (first_name, last_name, role_id) VALUES ($1, $2, $3)'
         const values = [res.fName, res.lName, role_id];
         await pool.query(text, values)
 
+        // Logs the action
         console.log(`Added ${res.fName} ${res.lName} to database`)
       } catch (err) {
         console.error(err)
       } finally {
+        // Return to the initial question loop
         init();
       }
     }
@@ -129,18 +140,22 @@ function handleAddRole() {
     .prompt(addRoleQuestions)
     .then(async (res) => {
       try {
+        // Stores input as usable variables to be passed into values array
         const title = res.newRoleName
         const salary = parseInt(res.salary)
-        const dept_id = findDeptId(res.newRoleDept)
+        const dept_id = await findDeptId(res.newRoleDept)
 
+        // Text and value variables to be passsed into pool.query
         const text = 'INSERT INTO roles (title, salary, dept_id) VALUES ($1, $2, $3)'
         const values = [title, salary, dept_id];
         await pool.query(text, values)
 
+        // Logs the action
         console.log(`Added ${res.newRoleName} in the ${res.newRoleDept} department to database`)
       } catch (err) {
         console.error(err)
       } finally {
+        // Return to the initial question loop
         init();
       }
     }
@@ -153,13 +168,17 @@ function handleAddDept() {
     .prompt(addDeptQuestion)
     .then(async (res) => {
       try {
+        // Text and value variables to be passed into pool.query
         const text = 'INSERT INTO departments (dept_name) VALUES ($1)'
         const values = [res.newDeptName];
         pool.query(text, values)
+
+        // Logs the action
         console.log(`Added ${res.newDeptName} department to database`);
       } catch (err) {
         console.error(err);
       } finally {
+        // Return to the initial question loop
         init();
       }
     }
@@ -172,23 +191,25 @@ function handleUpdateEmployeeRole() {
     .prompt(updateEmployeeRoleQuestions)
     .then(async (res) => {
       try {
+        // Splits full name into first and last names
         splitName = res.selectedEmployee.split(' ');
 
+        // Find employee IDs and role IDs and stores as a variable
         const employeeId = await findEmployeeId(splitName[0], splitName[1])
         const roleId = await findRoleId(res.newRole)
 
-        console.log(employeeId) // should log 1
-        console.log(roleId) // should log 1
-
+        // Text and value variables to be passed into pool.query
         const text = `UPDATE employees SET role_id = $1 WHERE id = $2;`
         const values = [roleId, employeeId]
 
         await pool.query(text, values)
 
+        // Logs the action
         console.log(`Updated ${res.selectedEmployee} to ${res.newRole} in database`)
       } catch (err) {
         console.error(err);
       } finally {
+        // Return to the initial question loop
         init();
       }
     }
@@ -211,8 +232,10 @@ function init() {
         console.log("Now displaying all employees: ")
         handleViewEmployees();
       } else if (res.initQuestion == "View all roles") {
+        console.log("Now displaying all roles: ")
         handleViewRoles();
       } else if (res.initQuestion == "View all departments") {
+        console.log("Now displaying all departments: ")
         handleViewDepts();
       } else if (res.initQuestion == "Add Employee") {
         handleAddEmployee();

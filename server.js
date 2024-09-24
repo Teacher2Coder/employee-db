@@ -1,33 +1,51 @@
+// Import packages
 const { Pool } = require('pg');
 const inquirer = require('inquirer');
-const questions = require('./inquirer/questions')
 const http = require('http');
+
+// Import questions
+const questions = require('./inquirer/questions');
+const initQuestion = questions[0]
+const addDeptQuestion = questions[1]
+const addRoleQuestions = questions[2]
+const addEmployeeQuestions = questions[3]
+const updateEmployeeRoleQuestions = questions[4];
+
+// Import helper functions
+const {findEmployeeId, findRoleId, findDeptId} = require('./db/helpers/find-id')
+
+
+// Call server
 const server = http.createServer(function (req, res) {
   res.write("Server started");
   res.end();
 })
 server.listen(3001);
 
-const line1 = String.raw`.------------------------------------------------------------------------.`
-const line2 = String.raw`|                                                                        |`
-const line3 = String.raw`|     ______                     _                                       |`
-const line4 = String.raw`|    | _____|                   | |                                      |`
-const line5 = String.raw`|    | |____  _ __ ___    _ __  | |   ___    _   _   _____    _____      |`
-const line6 = String.raw`|    |  ____||  _ ' _  \ |     \| | / __  \ | | | | /  __ \  /  __ \     |`
-const line7 = String.raw`|    | |____ | | | | | | | |_) || || (__)  || |_| ||  ____/ |  ____/     |`
-const line8 = String.raw`|    |______||_| |_| |_| | .__/ |_| \ ___ /  \__  | \______| \______|    |`
-const line9 = String.raw`|                        |_|                  |__/                       |`
-const line10= String.raw`|                                                                        |`
-const line11= String.raw`|       __   __                                                          |`
-const line12= String.raw`|      |  \_/  |                                                         |`
-const line13= String.raw`|      |       |   ___ _   _ __     ___ _    __ _    _____    _ __       |`
-const line14= String.raw`|      | |\_/| |  / _ ' | |  _  \  / _ ' |  / _  |  /  __ \  | '__|      |`
-const line15= String.raw`|      | |   | | | (_|  | | | | | | (_|  | | (_| | |  ____/  | |         |`
-const line16= String.raw`|      |_|   |_|  \___,_| |_| |_|  \___,_|  \__, |  \______| |_|         |`
-const line17= String.raw`|                                           |___/                        |`
-const line18= String.raw`.------------------------------------------------------------------------.`
 
+// Image to be displayed on startup
+const funImage = String.raw`
+.------------------------------------------------------------------------.
+|                                                                        |
+|     ______                     _                                       |
+|    | _____|                   | |                                      |
+|    | |____  _ __ ___    _ __  | |   ___    _   _   _____    _____      |
+|    |  ____||  _ ' _  \ |     \| | / __  \ | | | | /  __ \  /  __ \     |
+|    | |____ | | | | | | | |_) || || (__)  || |_| ||  ____/ |  ____/     |
+|    |______||_| |_| |_| | .__/ |_| \ ___ /  \__  | \______| \______|    |
+|                        |_|                  |__/                       |
+|                                                                        |
+|       __   __                                                          |
+|      |  \_/  |                                                         |
+|      |       |   ___ _   _ __     ___ _    __ _    _____    _ __       |
+|      | |\_/| |  / _ ' | |  _  \  / _ ' |  / _  |  /  __ \  | '__|      |
+|      | |   | | | (_|  | | | | | | (_|  | | (_| | |  ____/  | |         |
+|      |_|   |_|  \___,_| |_| |_|  \___,_|  \__, |  \______| |_|         |
+|                                           |___/                        |
+.------------------------------------------------------------------------.
+`
 
+// Creates pool with login creditials
 const pool = new Pool(
     {
       user: 'postgres',
@@ -35,18 +53,18 @@ const pool = new Pool(
       host: 'localhost',
       database: 'employees_db'
     },
-    console.log(` ${line1} \n ${line2} \n ${line3} \n ${line4} \n ${line5} \n ${line6} \n ${line7} \n ${line8} \n ${line9} \n ${line10} \n ${line11} \n ${line12} \n ${line13} \n ${line14} \n ${line15} \n ${line16} \n ${line17} \n ${line18}`
-    )
+    console.log(funImage)
 )
 
 pool.connect();
+
 
 // Displays all employees from employee table
 function handleViewEmployees() {
   pool.query(`SELECT employees.first_name, employees.last_name, roles.title, roles.salary, departments.dept_name FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id;`, 
     async (err, { rows }) => {
     try {
-      console.log(rows);
+      console.table(rows);
     } catch (err) {
       console.error(err)
     } finally {
@@ -60,7 +78,7 @@ function handleViewEmployees() {
 function handleViewRoles() {
   pool.query(`SELECT roles.title, roles.salary, departments.dept_name FROM roles JOIN departments ON roles.department_id = departments.id;`, async (err, { rows }) => {
     try {
-      console.log(rows);
+      console.table(rows);
     } catch (err) {
       console.error(err)
     } finally {
@@ -69,11 +87,12 @@ function handleViewRoles() {
   })
 }
 
+
 // Displays all departments from the departments table
 function handleViewDepts() {
   pool.query(`SELECT dept_name FROM departments`, async (err, { rows }) => {
     try {
-      console.log(rows);
+      console.table(rows);
     } catch (err) {
       console.error(err)
     } finally {
@@ -85,65 +104,95 @@ function handleViewDepts() {
 // Adds an employee to the employee table
 function handleAddEmployee() {
   inquirer
-    .prompt(questions[3])
+    .prompt(addEmployeeQuestions)
     .then(async (res) => {
       try {
-        const text = 'INSERT INTO employees (first_name, last_name, role) VALUES ($1, $2, $3)'
-        const values = [res.fName, res.lName, res.role];
-        pool.query(text, values)
+        const role_id = findRoleId(res.role)
+
+        const text = 'INSERT INTO employees (first_name, last_name, role_id) VALUES ($1, $2, $3)'
+        const values = [res.fName, res.lName, role_id];
+        await pool.query(text, values)
+
         console.log(`Added ${res.fName} ${res.lName} to database`)
       } catch (err) {
         console.error(err)
       } finally {
         init();
       }
-  })
+    }
+  )
 }
 
 // Adds a role to the role table
 function handleAddRole() {
   inquirer
-    .prompt(questions[2])
+    .prompt(addRoleQuestions)
     .then(async (res) => {
       try {
-        const text = 'INSERT INTO roles (first_name, last_name, role) VALUES ($1, $2, $3)'
-        const values = [];
-        pool.query(text, values)
+        const title = res.newRoleName
+        const salary = parseInt(res.salary)
+        const dept_id = findDeptId(res.newRoleDept)
+
+        const text = 'INSERT INTO roles (title, salary, dept_id) VALUES ($1, $2, $3)'
+        const values = [title, salary, dept_id];
+        await pool.query(text, values)
+
         console.log(`Added ${res.newRoleName} in the ${res.newRoleDept} department to database`)
       } catch (err) {
         console.error(err)
       } finally {
         init();
       }
-    })
+    }
+  )
 }
 
 // Adds a department to the department table
 function handleAddDept() {
   inquirer
-    .prompt(questions[1])
+    .prompt(addDeptQuestion)
     .then(async (res) => {
       try {
-        const text = 'INSERT INTO departments (first_name, last_name, role) VALUES ($1, $2, $3)'
-        const values = [];
+        const text = 'INSERT INTO departments (dept_name) VALUES ($1)'
+        const values = [res.newDeptName];
         pool.query(text, values)
-        console.log(`Added ${res.newDeptName} to database`);
+        console.log(`Added ${res.newDeptName} department to database`);
       } catch (err) {
         console.error(err);
       } finally {
         init();
       }
-    })
+    }
+  )
 }
 
 // Updates an employee's role in the employee table
 function handleUpdateEmployeeRole() {
   inquirer
-    .prompt(questions[4])
+    .prompt(updateEmployeeRoleQuestions)
     .then(async (res) => {
-      console.log(`Updated ${res.selectedEmployee} to ${res.newRole} in database`)
-    })
-  // return init();
+      try {
+        splitName = res.selectedEmployee.split(' ');
+
+        const employeeId = await findEmployeeId(splitName[0], splitName[1])
+        const roleId = await findRoleId(res.newRole)
+
+        console.log(employeeId) // should log 1
+        console.log(roleId) // should log 1
+
+        const text = `UPDATE employees SET role_id = $1 WHERE id = $2;`
+        const values = [roleId, employeeId]
+
+        await pool.query(text, values)
+
+        console.log(`Updated ${res.selectedEmployee} to ${res.newRole} in database`)
+      } catch (err) {
+        console.error(err);
+      } finally {
+        init();
+      }
+    }
+  )
 }
 
 // Exits the application
@@ -156,9 +205,8 @@ function handleQuit() {
 // Directs the user to the appropriate function based on their input
 function init() {
   inquirer
-    .prompt(questions[0])
+    .prompt(initQuestion)
     .then((res) => {
-      console.log(res.initQuestion);
       if (res.initQuestion == "View all employees") {
         console.log("Now displaying all employees: ")
         handleViewEmployees();

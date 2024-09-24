@@ -17,20 +17,38 @@ To set up the database, run ``` psql -U postgres``` Login with the password "tea
 ## Usage
 To initialize the application, run ``` node server.js```
 
+![Main Menu](./assets/main-menu.png)
+
 You will be asked to select an option from a list, including "View employees", "View roles", "View departments", "Add employee", "Add roles", "Add departments", "Update employee role", and "Quit"
 
 If the user selects "View employees" the console will log a table of all employees, their roles, their salary, and the department they work for.
 
+![View Employees](./assets/employees.png)
+
 If the user selects "View roles" the console will log a table of all roless, the salary associated with that role and the department the role is under.
+
+![View Roles](./assets/roles.png)
 
 If the user selects "View departments" the console will log a table of all departments.
 
+![View Depts](./assets/depts.png)
+
 If the user selects "Add employee", the console will prompt the user to input their first name, their last name, and the role that the employee will have. Once all values have been inputed, the employee will be added to the database. The user can confirm that they were added by navigating back to "View employees" and noting that the new employee is at the bottom of the table.
+
+![Add employee](./assets/add-employee.png)
 
 If the user selects "Add role", the console will prompt the user to input the name of the new role and what department the role will belong to. Once both values have been inputed, the role will be added to the database. The user can confirm that it was added to the database by navigating back to "View Roles" and noting that the new role is at the bottom of the table.
 
-If the user selects "Add department", the console will prompt the user to input the name of the new department. Once the name has been inputed, the new department will be added to the database. The user can confirm that it was added to the database b y navigating back to "View departments" and noting that the new department is at the bottom of the table.
- 
+![Add role](./assets/add-role.png)
+
+If the user selects "Add department", the console will prompt the user to input the name of the new department. Once the name has been inputed, the new department will be added to the database. The user can confirm that it was added to the database by navigating back to "View departments" and noting that the new department is at the bottom of the table.
+
+![Add dept](./assets/add-dept.png)
+
+If the user selects "Update employee role", the console will prompt the user to select an employee and their new role. Once those two values have been inputed, the user's data will be updated in the database. The user can confirm this by navigating back to "View employees" and noting that the selected employee will now be at the bottom of the table and their role will be changed to the role the user selected.
+
+![Update role](./assets/update.png)
+
 ## License
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

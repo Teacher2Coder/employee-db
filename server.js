@@ -4,12 +4,7 @@ const inquirer = require('inquirer');
 const http = require('http');
 
 // Import questions
-const questions = require('./inquirer/questions');
-const initQuestion = questions[0]
-const addDeptQuestion = questions[1]
-const addRoleQuestions = questions[2]
-const addEmployeeQuestions = questions[3]
-const updateEmployeeRoleQuestions = questions[4];
+const { initQuestion, addDeptQuestion, addRoleQuestions, addEmployeeQuestions, updateEmployeeRoleQuestions } = require('./inquirer/questions');
 
 // Import helper functions
 const {findEmployeeId, findRoleId, findDeptId} = require('./db/helpers/find-id')
@@ -115,7 +110,6 @@ function handleAddEmployee() {
       try {
         // Stores role as a usable variable
         const role_id = await findRoleId(res.role)
-        console.log(role_id)
 
         // Text and value variables to be passsed into pool.query
         const text = 'INSERT INTO employees (first_name, last_name, role_id) VALUES ($1, $2, $3)'
@@ -142,11 +136,11 @@ function handleAddRole() {
       try {
         // Stores input as usable variables to be passed into values array
         const title = res.newRoleName
-        const salary = parseInt(res.salary)
+        const salary = res.salary
         const dept_id = await findDeptId(res.newRoleDept)
 
         // Text and value variables to be passsed into pool.query
-        const text = 'INSERT INTO roles (title, salary, dept_id) VALUES ($1, $2, $3)'
+        const text = 'INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3)'
         const values = [title, salary, dept_id];
         await pool.query(text, values)
 

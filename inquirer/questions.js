@@ -17,7 +17,7 @@ const addDeptQuestion = [
         type: 'input',
         message: 'What do you want to call the new department?',
         name: 'newDeptName',
-    }
+    },
 ]
 
 // Questions for adding roles
@@ -25,19 +25,19 @@ const addRoleQuestions = [
     {
         type: 'input',
         message: 'What do you want to call the new role?',
-        name: 'newRoleName'
+        name: 'newRoleName',
     },
     {
-        type: 'input',
-        message: "What will the salary for this position be?",
-        name: 'salary'
+        type: 'number',
+        message: 'What will the salary for this position be?',
+        name: "salary",
     },
     {
-        type: 'input',
+        type: 'list',
         message: 'What department will this role belong to?',
         name: 'newRoleDept',
-        choices: getDepts()
-    }
+        choices: getDepts(),
+    },
 ]
 
 // Questions for adding employees
@@ -50,13 +50,13 @@ const addEmployeeQuestions = [
     {
         type: 'input',
         message: "What is the employee's last name?",
-        name: 'lName'
+        name: 'lName',
     },
     {
        type: 'list',
        message: "What is the employee's role?",
        name: 'role',
-       choices: getRoles()
+       choices: getRoles(),
     }
 ]
 
@@ -66,14 +66,14 @@ const updateEmployeeRoleQuestions = [
         type: 'list',
         message: "Which employee's role would you like to update?",
         name: 'selectedEmployee',
-        choices: getEmployees()
+        choices: getEmployees(),
     },
     {
         type: 'list',
         message: "What is their new role?",
         name: 'newRole',
-        choices: getRoles()
+        choices: getRoles(),
     }
 ]
 
-module.exports = [initQuestion, addDeptQuestion, addRoleQuestions, addEmployeeQuestions, updateEmployeeRoleQuestions];
+module.exports = { initQuestion, addDeptQuestion, addRoleQuestions, addEmployeeQuestions, updateEmployeeRoleQuestions };

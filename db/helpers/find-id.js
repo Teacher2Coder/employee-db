@@ -7,7 +7,7 @@ const pool = new Pool(
       host: 'localhost',
       database: 'employees_db'
     },
-    console.log("Success")
+    console.log("Find IDs helper functions ready!")
 )
 
 pool.connect();
